@@ -10,7 +10,7 @@ from alembic import context
 # Add src directory to path for imports
 sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 
-from app.core.config import settings
+from app.core.config import get_settings
 from app.core.database import Base
 from app.domains.user.infrastructure.database.models import UserModel  # noqa: F401
 
@@ -45,7 +45,7 @@ def run_migrations_offline() -> None:
     script output.
 
     """
-    url = settings.DATABASE_URL
+    url = get_settings().DATABASE_URL
     context.configure(
         url=url,
         target_metadata=target_metadata,
@@ -66,8 +66,8 @@ def run_migrations_online() -> None:
     """
 
     connectable = create_async_engine(
-        settings.DATABASE_URL,
-        echo=settings.DEBUG,
+        get_settings().DATABASE_URL,
+        echo=get_settings().DEBUG,
     )
 
     async def run_async_migration():

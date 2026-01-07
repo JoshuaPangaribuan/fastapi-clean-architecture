@@ -9,7 +9,9 @@ dependencies = [
     "asyncpg>=0.30.0",
     "fastapi[standard]>=0.128.0",
     "greenlet>=3.3.0",
+    "pydantic-settings>=2.0.0",
     "sqlalchemy>=2.0.45",
+    "watchfiles>=0.21.0",
 ]
 
 [project.optional-dependencies]
