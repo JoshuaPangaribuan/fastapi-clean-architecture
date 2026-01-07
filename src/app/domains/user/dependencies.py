@@ -17,28 +17,28 @@ def get_user_repository(db: AsyncSession = Depends(get_db)) -> SQLAlchemyUserRep
 
 
 def get_create_user_use_case(
-    repo: SQLAlchemyUserRepository = Depends(get_user_repository)
+    repo: SQLAlchemyUserRepository = Depends(get_user_repository),
 ) -> CreateUserUseCase:
     """Get the create user use case."""
     return CreateUserUseCase(repo)
 
 
 def get_user_by_id_use_case(
-    repo: SQLAlchemyUserRepository = Depends(get_user_repository)
+    repo: SQLAlchemyUserRepository = Depends(get_user_repository),
 ) -> GetUserByIdUseCase:
     """Get the get user by ID use case."""
     return GetUserByIdUseCase(repo)
 
 
 def get_all_users_use_case(
-    repo: SQLAlchemyUserRepository = Depends(get_user_repository)
+    repo: SQLAlchemyUserRepository = Depends(get_user_repository),
 ) -> GetAllUsersUseCase:
     """Get the get all users use case."""
     return GetAllUsersUseCase(repo)
 
 
 def get_delete_user_use_case(
-    repo: SQLAlchemyUserRepository = Depends(get_user_repository)
+    repo: SQLAlchemyUserRepository = Depends(get_user_repository),
 ) -> DeleteUserUseCase:
     """Get the delete user use case."""
     return DeleteUserUseCase(repo)

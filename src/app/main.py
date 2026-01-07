@@ -8,9 +8,11 @@ It wires together all the components and starts the server.
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
+from starlette.exceptions import HTTPException as StarletteHTTPException
 
 from app.core.config import settings
-from app.core.database import Base, engine
+from app.core.exceptions import AppError
+from app.core.handlers import app_exception_handler, http_exception_handler
 from app.domains.user.presentation.v1.router import router as user_router
 
 
@@ -35,15 +37,11 @@ app = FastAPI(
 )
 
 
-from starlette.exceptions import HTTPException as StarletteHTTPException
-from app.core.exceptions import AppException
-from app.core.handlers import app_exception_handler, http_exception_handler
-
 # Include routers
 app.include_router(user_router, prefix=settings.API_V1_PREFIX)
 
 # Register exception handlers
-app.add_exception_handler(AppException, app_exception_handler)
+app.add_exception_handler(AppError, app_exception_handler)
 app.add_exception_handler(StarletteHTTPException, http_exception_handler)
 
 

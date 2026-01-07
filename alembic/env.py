@@ -1,20 +1,17 @@
+# Import database Base and models for autogenerate support
+import sys
 from logging.config import fileConfig
+from pathlib import Path
 
-from sqlalchemy import engine_from_config
-from sqlalchemy import pool
 from sqlalchemy.ext.asyncio import create_async_engine
 
 from alembic import context
 
-# Import database Base and models for autogenerate support
-import sys
-from pathlib import Path
-
 # Add src directory to path for imports
 sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 
-from app.core.database import Base
 from app.core.config import settings
+from app.core.database import Base
 from app.domains.user.infrastructure.database.models import UserModel  # noqa: F401
 
 # this is the Alembic Config object, which provides
@@ -67,13 +64,10 @@ def run_migrations_online() -> None:
     and associate a connection with the context.
 
     """
-    from sqlalchemy.ext.asyncio import create_async_engine
-    from sqlalchemy.ext.asyncio import async_sessionmaker
 
     connectable = create_async_engine(
         settings.DATABASE_URL,
         echo=settings.DEBUG,
-        connect_args={"check_same_thread": False},
     )
 
     async def run_async_migration():

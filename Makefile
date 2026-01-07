@@ -1,4 +1,4 @@
-.PHONY: help dev migrate-up migrate-down migrate-new migrate-refresh db-reset run fmt lint
+.PHONY: help dev migrate-up migrate-down migrate-new migrate-refresh db-reset db-up db-down db-logs run fmt lint
 
 # Default target
 help:
@@ -10,7 +10,10 @@ help:
 	@echo "  make migrate-down     - Rollback last migration"
 	@echo "  make migrate-new MSG='desc' - Create new migration"
 	@echo "  make migrate-refresh  - Downgrade then upgrade"
-	@echo "  make db-reset         - Delete DB + fresh migrations"
+	@echo "  make db-reset         - Reset PostgreSQL + fresh migrations"
+	@echo "  make db-up            - Start PostgreSQL container"
+	@echo "  make db-down          - Stop PostgreSQL container"
+	@echo "  make db-logs          - View PostgreSQL logs"
 	@echo "  make run              - Start server only"
 	@echo "  make fmt              - Format code with ruff"
 	@echo "  make lint             - Lint code with ruff"
@@ -47,9 +50,22 @@ migrate-refresh: migrate-down migrate-up
 # Database management
 db-reset:
 	@echo "🗑️  Resetting database..."
-	@rm -f data/fastapi-clean-arch.db
-	@echo "✅ Database deleted"
-	@make migrate-up
+	@docker-compose down -v
+	@docker-compose up -d
+	@echo "✅ Database reset complete"
+
+db-up:
+	@echo "🐘 Starting PostgreSQL..."
+	@docker-compose up -d
+	@echo "✅ PostgreSQL started"
+
+db-down:
+	@echo "⏹️  Stopping PostgreSQL..."
+	@docker-compose down
+	@echo "✅ PostgreSQL stopped"
+
+db-logs:
+	@docker-compose logs -f postgres
 
 # Application
 run:

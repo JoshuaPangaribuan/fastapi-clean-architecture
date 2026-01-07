@@ -12,7 +12,7 @@ class Settings:
     DEBUG: bool = True
 
     # Database
-    DATABASE_URL: str = "sqlite+aiosqlite:///./data/fastapi-clean-arch.db"
+    DATABASE_URL: str = "postgresql+asyncpg://postgres:postgres@localhost:5432/fastapi_clean_arch"
 
     # API
     API_V1_PREFIX: str = "/api/v1"

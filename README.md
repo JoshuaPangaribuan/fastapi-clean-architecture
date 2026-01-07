@@ -8,6 +8,8 @@ A production-ready FastAPI application implementing Clean Architecture principle
 - Python 3.12+
 - [uv](https://github.com/astral-sh/uv) (Python package installer)
 - [make](https://www.gnu.org/software/make/) (Build automation)
+- Docker & Docker Compose (for PostgreSQL)
+- PostgreSQL 16+
 
 ### Installation
 
@@ -17,7 +19,33 @@ uv sync
 
 # Optional: Create .env file from example
 cp .env.example .env
+
+# Start PostgreSQL
+docker-compose up -d
 ```
+
+## 🛠️ Tech Stack
+
+### Core Framework
+- **FastAPI** - Modern, fast web framework for building APIs with Python 3.12+
+- **Python** - Primary language (3.12+)
+
+### Database & ORM
+- **PostgreSQL 16** - Relational database
+- **SQLAlchemy 2.0** - Python SQL toolkit and ORM
+- **asyncpg** - High-performance PostgreSQL driver for asyncio
+- **Alembic** - Database migration tool
+
+### Data Validation
+- **Pydantic** - Data validation using Python type annotations (included in FastAPI)
+
+### Development Tools
+- **uv** - Fast Python package installer and resolver
+- **make** - Build automation and task runner
+- **Docker & Docker Compose** - Containerization for PostgreSQL
+
+### Architecture
+- **Clean Architecture** - Layered architecture pattern for maintainable and testable code
 
 ## 📦 Development Workflow 
 
@@ -25,6 +53,7 @@ cp .env.example .env
 
 ```bash
 # Run migrations + start server
+make db-up  # First time only
 make dev
 ```
 
@@ -36,10 +65,13 @@ This command:
 ### Step-by-Step Development
 
 ```bash
-# 1. Run migrations (after model changes)
+# 1. Start PostgreSQL (if not already running)
+make db-up
+
+# 2. Run migrations (after model changes)
 make migrate-up
 
-# 2. Start server (if not already running)
+# 3. Start server (if not already running)
 make run
 ```
 
@@ -68,11 +100,24 @@ make migrate-refresh
 ### Reset Database
 
 ```bash
-# Delete database and apply fresh migrations
+# Delete PostgreSQL data and apply fresh migrations
 make db-reset
 ```
 
-**⚠️ Warning:** `db-reset` will delete all data in the database.
+**⚠️ Warning:** `db-reset` will delete all data in the database and recreate the PostgreSQL container.
+
+### PostgreSQL Management
+
+```bash
+# Start PostgreSQL container
+make db-up
+
+# Stop PostgreSQL container
+make db-down
+
+# View PostgreSQL logs
+make db-logs
+```
 
 ## 📝 Common Tasks
 
@@ -87,16 +132,11 @@ make db-reset
 ### Code Quality
 
 ```bash
-# Format code (requires ruff)
+# Format code
 make fmt
 
-# Lint code (requires ruff)
+# Lint code
 make lint
-```
-
-To enable linting, add ruff to dependencies:
-```bash
-uv pip add ruff
 ```
 
 ## 📚 Project Structure
@@ -105,8 +145,6 @@ uv pip add ruff
 fastapi-clean-arch/
 ├── alembic/                    # Database migrations
 │   └── versions/               # Migration scripts
-├── data/                       # Database files (gitignored)
-│   └── fastapi-clean-arch.db   # SQLite database
 ├── src/
 │   └── app/
 │       ├── core/               # Core configuration
@@ -127,6 +165,7 @@ fastapi-clean-arch/
 ├── .env.example                # Environment variables template
 ├── Makefile                    # Build automation
 ├── alembic.ini                 # Alembic configuration
+├── docker-compose.yml          # PostgreSQL container
 ├── pyproject.toml              # Python dependencies
 └── README.md
 ```
@@ -144,7 +183,10 @@ Run `make help` or `make` for a complete list of available commands.
 | `make migrate-down` | Rollback last migration |
 | `make migrate-new MSG='desc'` | Create new migration |
 | `make migrate-refresh` | Downgrade then upgrade |
-| `make db-reset` | Delete DB + fresh migrations |
+| `make db-reset` | Reset PostgreSQL + fresh migrations |
+| `make db-up` | Start PostgreSQL container |
+| `make db-down` | Stop PostgreSQL container |
+| `make db-logs` | View PostgreSQL logs |
 | `make run` | Start server only |
 | `make fmt` | Format code (requires ruff) |
 | `make lint` | Lint code (requires ruff) |
