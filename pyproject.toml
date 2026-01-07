@@ -1,0 +1,13 @@
+[project]
+name = "fastapi-clean-arch"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "alembic>=1.17.2",
+    "aiosqlite>=0.22.0",
+    "fastapi[standard]>=0.128.0",
+    "greenlet>=3.3.0",
+    "sqlalchemy>=2.0.45",
+]
