@@ -5,7 +5,7 @@ This contains the application business logic for creating a user.
 It orchestrates the flow and uses the repository interface.
 """
 
-from app.core.exceptions import ResourceConflictError
+from app.core.errors import ResourceConflictError
 from app.domains.user.mappers.dtos import (
     CreateUserInputDTO as CreateUserInput,
 )

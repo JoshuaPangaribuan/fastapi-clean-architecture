@@ -9,7 +9,7 @@ import logging
 import sys
 from pathlib import Path
 
-from app.core.config import get_settings
+from ..config import get_settings
 
 
 def setup_logging() -> None:

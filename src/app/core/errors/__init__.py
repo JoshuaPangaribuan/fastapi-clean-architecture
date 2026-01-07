@@ -1,32 +1,27 @@
-"""Core module - configuration and shared utilities."""
+"""Errors module."""
 
-from app.core.config import Settings, SettingsReloader, get_settings, reloader
-from app.core.database import AsyncSessionLocal, Base, engine, get_db
-from app.core.errors import (
+from app.core.errors.exceptions import (
     AppError,
     AuthenticationError,
     AuthorizationError,
     BusinessRuleError,
     DomainError,
-    ErrorDetail,
-    ErrorResponse,
     InvalidOperationError,
     ResourceConflictError,
     ResourceNotFoundError,
     ValidationError,
+)
+from app.core.errors.handlers import (
     app_exception_handler,
     http_exception_handler,
     validation_exception_handler,
 )
-from app.core.logging import setup_logging
-from app.core.validation import parse_uuid
+from app.core.errors.schemas import ErrorDetail, ErrorResponse
 
 __all__ = [
     "AppError",
     "AuthenticationError",
     "AuthorizationError",
-    "AsyncSessionLocal",
-    "Base",
     "BusinessRuleError",
     "DomainError",
     "ErrorDetail",
@@ -34,16 +29,8 @@ __all__ = [
     "InvalidOperationError",
     "ResourceConflictError",
     "ResourceNotFoundError",
-    "Settings",
-    "SettingsReloader",
     "ValidationError",
     "app_exception_handler",
-    "engine",
-    "get_db",
-    "get_settings",
     "http_exception_handler",
-    "parse_uuid",
-    "reloader",
-    "setup_logging",
     "validation_exception_handler",
 ]

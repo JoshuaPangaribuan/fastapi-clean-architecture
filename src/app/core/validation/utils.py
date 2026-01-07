@@ -6,7 +6,7 @@ This module provides reusable validation functions used across the application.
 
 from uuid import UUID
 
-from app.core.exceptions import DomainError
+from ..errors import DomainError
 
 
 def parse_uuid(value: str, field_name: str = "ID") -> UUID:

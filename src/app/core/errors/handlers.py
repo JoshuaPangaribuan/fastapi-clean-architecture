@@ -13,7 +13,7 @@ from fastapi.responses import JSONResponse
 from pydantic import ValidationError
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
-from app.core.exceptions import (
+from .exceptions import (
     AppError,
     AuthenticationError,
     AuthorizationError,

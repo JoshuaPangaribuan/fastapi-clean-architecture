@@ -4,7 +4,7 @@ Get User Use Case.
 This contains the application business logic for retrieving users.
 """
 
-from app.core.exceptions import ResourceNotFoundError
+from app.core.errors import ResourceNotFoundError
 from app.core.validation import parse_uuid
 from app.domains.user.mappers.dtos import GetUserOutputDTO as GetUserOutput
 from app.domains.user.mappers.entity_dto_mapper import UserEntityDtoMapper

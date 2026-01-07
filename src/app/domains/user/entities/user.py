@@ -9,7 +9,7 @@ from dataclasses import dataclass, field
 from datetime import UTC, datetime
 from uuid import UUID, uuid4
 
-from app.core.exceptions import ValidationError as DomainValidationError
+from app.core.errors import ValidationError as DomainValidationError
 
 
 @dataclass

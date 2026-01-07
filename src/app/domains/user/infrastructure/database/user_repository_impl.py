@@ -10,7 +10,7 @@ from uuid import UUID
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.core.exceptions import ResourceNotFoundError
+from app.core.errors import ResourceNotFoundError
 from app.domains.user.entities.user import User
 from app.domains.user.infrastructure.database.models import UserModel
 from app.domains.user.mappers.entity_model_mapper import UserEntityModelMapper
