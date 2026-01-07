@@ -13,6 +13,9 @@ from app.domains.user.dependencies import (
     get_delete_user_use_case,
     get_user_by_id_use_case,
 )
+from app.domains.user.mappers.dtos import (
+    CreateUserInputDTO as CreateUserInput,
+)
 from app.domains.user.presentation.v1.schemas import (
     MessageResponse,
     UserCreateRequest,
@@ -20,10 +23,7 @@ from app.domains.user.presentation.v1.schemas import (
     UserListResponse,
     UserResponse,
 )
-from app.domains.user.use_cases.create_user import (
-    CreateUserInput,
-    CreateUserUseCase,
-)
+from app.domains.user.use_cases.create_user import CreateUserUseCase
 from app.domains.user.use_cases.delete_user import DeleteUserUseCase
 from app.domains.user.use_cases.get_user import (
     GetAllUsersUseCase,
@@ -50,9 +50,7 @@ async def create_user(
     input_data = CreateUserInput(email=request.email, name=request.name)
     output = await use_case.execute(input_data)
 
-    return UserResponse(
-        id=output.id, email=output.email, name=output.name, is_active=output.is_active
-    )
+    return UserResponse.model_validate(output.model_dump())
 
 
 @router.get(
@@ -65,20 +63,11 @@ async def get_users(
     skip: int = 0, limit: int = 100, use_case: GetAllUsersUseCase = Depends(get_all_users_use_case)
 ) -> UserListResponse:
     """Get all users with pagination."""
-    users = await use_case.execute(skip=skip, limit=limit)
+    users_dto = await use_case.execute(skip=skip, limit=limit)
 
     return UserListResponse(
-        users=[
-            UserDetailResponse(
-                id=user.id,
-                email=user.email,
-                name=user.name,
-                is_active=user.is_active,
-                created_at=user.created_at,
-            )
-            for user in users
-        ],
-        total=len(users),
+        users=[UserDetailResponse.model_validate(user.model_dump()) for user in users_dto],
+        total=len(users_dto),
     )
 
 
@@ -94,13 +83,7 @@ async def get_user(
     """Get a user by their ID."""
     output = await use_case.execute(user_id)
 
-    return UserDetailResponse(
-        id=output.id,
-        email=output.email,
-        name=output.name,
-        is_active=output.is_active,
-        created_at=output.created_at,
-    )
+    return UserDetailResponse.model_validate(output.model_dump())
 
 
 @router.delete(

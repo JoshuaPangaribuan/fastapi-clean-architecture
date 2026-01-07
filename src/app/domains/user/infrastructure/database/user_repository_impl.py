@@ -12,6 +12,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.domains.user.entities.user import User
 from app.domains.user.infrastructure.database.models import UserModel
+from app.domains.user.mappers.entity_model_mapper import UserEntityModelMapper
 from app.domains.user.repositories.user_repository import UserRepositoryInterface
 
 
@@ -23,44 +24,24 @@ class SQLAlchemyUserRepository(UserRepositoryInterface):
     It implements the port (UserRepositoryInterface) using SQLAlchemy.
     """
 
-    def __init__(self, db: AsyncSession) -> None:
+    def __init__(self, db: AsyncSession, mapper: UserEntityModelMapper) -> None:
         """
-        Initialize the repository with a database session.
+        Initialize the repository with a database session and mapper.
 
         Args:
             db: SQLAlchemy database session.
+            mapper: User entity-model mapper.
         """
         self._db = db
-
-    def _to_entity(self, model: UserModel) -> User:
-        """Convert SQLAlchemy model to domain entity."""
-        return User(
-            id=UUID(model.id),
-            email=model.email,
-            name=model.name,
-            is_active=model.is_active,
-            created_at=model.created_at,
-            updated_at=model.updated_at,
-        )
-
-    def _to_model(self, entity: User) -> UserModel:
-        """Convert domain entity to SQLAlchemy model."""
-        return UserModel(
-            id=str(entity.id),
-            email=entity.email,
-            name=entity.name,
-            is_active=entity.is_active,
-            created_at=entity.created_at,
-            updated_at=entity.updated_at,
-        )
+        self._mapper = mapper
 
     async def create(self, user: User) -> User:
         """Create a new user in the database."""
-        model = self._to_model(user)
+        model = self._mapper.to_model(user)
         self._db.add(model)
         await self._db.commit()
         await self._db.refresh(model)
-        return self._to_entity(model)
+        return self._mapper.to_entity(model)
 
     async def get_by_id(self, user_id: UUID) -> User | None:
         """Get a user by their ID."""
@@ -71,7 +52,7 @@ class SQLAlchemyUserRepository(UserRepositoryInterface):
         if model is None:
             return None
 
-        return self._to_entity(model)
+        return self._mapper.to_entity(model)
 
     async def get_by_email(self, email: str) -> User | None:
         """Get a user by their email."""
@@ -82,14 +63,14 @@ class SQLAlchemyUserRepository(UserRepositoryInterface):
         if model is None:
             return None
 
-        return self._to_entity(model)
+        return self._mapper.to_entity(model)
 
     async def get_all(self, skip: int = 0, limit: int = 100) -> list[User]:
         """Get all users with pagination."""
         query = select(UserModel).offset(skip).limit(limit)
         result = await self._db.execute(query)
         models = result.scalars().all()
-        return [self._to_entity(model) for model in models]
+        return self._mapper.to_entities(models)
 
     async def update(self, user: User) -> User:
         """Update an existing user."""
@@ -109,7 +90,7 @@ class SQLAlchemyUserRepository(UserRepositoryInterface):
         await self._db.commit()
         await self._db.refresh(model)
 
-        return self._to_entity(model)
+        return self._mapper.to_entity(model)
 
     async def delete(self, user_id: UUID) -> bool:
         """Delete a user by their ID."""

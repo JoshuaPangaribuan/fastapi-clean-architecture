@@ -5,10 +5,14 @@ This contains the application business logic for creating a user.
 It orchestrates the flow and uses the repository interface.
 """
 
-from dataclasses import dataclass
-
 from app.core.exceptions import ResourceConflictError
-from app.domains.user.entities.user import User
+from app.domains.user.mappers.dtos import (
+    CreateUserInputDTO as CreateUserInput,
+)
+from app.domains.user.mappers.dtos import (
+    CreateUserOutputDTO as CreateUserOutput,
+)
+from app.domains.user.mappers.entity_dto_mapper import UserEntityDtoMapper
 from app.domains.user.repositories.user_repository import UserRepositoryInterface
 
 
@@ -16,24 +20,6 @@ class UserAlreadyExistsError(ResourceConflictError):
     """Raised when trying to create a user with an existing email."""
 
     pass
-
-
-@dataclass
-class CreateUserInput:
-    """Input data for creating a user."""
-
-    email: str
-    name: str
-
-
-@dataclass
-class CreateUserOutput:
-    """Output data after creating a user."""
-
-    id: str
-    email: str
-    name: str
-    is_active: bool
 
 
 class CreateUserUseCase:
@@ -44,14 +30,20 @@ class CreateUserUseCase:
     It depends on the repository interface, not the concrete implementation.
     """
 
-    def __init__(self, user_repository: UserRepositoryInterface) -> None:
+    def __init__(
+        self,
+        user_repository: UserRepositoryInterface,
+        mapper: UserEntityDtoMapper,
+    ) -> None:
         """
         Initialize the use case with dependencies.
 
         Args:
             user_repository: Repository interface for user data access.
+            mapper: User entity-DTO mapper.
         """
         self._user_repository = user_repository
+        self._mapper = mapper
 
     async def execute(self, input_data: CreateUserInput) -> CreateUserOutput:
         """
@@ -72,16 +64,11 @@ class CreateUserUseCase:
         if existing_user is not None:
             raise UserAlreadyExistsError(f"User with email {input_data.email} already exists")
 
-        # Create the user entity (this validates business rules)
-        user = User(email=input_data.email, name=input_data.name)
+        # Create the user entity from input DTO (this validates business rules)
+        user = self._mapper.from_create_input(input_data)
 
         # Persist the user
         created_user = await self._user_repository.create(user)
 
-        # Return the output
-        return CreateUserOutput(
-            id=str(created_user.id),
-            email=created_user.email,
-            name=created_user.name,
-            is_active=created_user.is_active,
-        )
+        # Return the output using mapper
+        return self._mapper.to_create_output(created_user)
