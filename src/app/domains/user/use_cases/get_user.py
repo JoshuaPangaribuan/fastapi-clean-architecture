@@ -4,9 +4,8 @@ Get User Use Case.
 This contains the application business logic for retrieving users.
 """
 
-from uuid import UUID
-
-from app.core.exceptions import DomainError, ResourceNotFoundError
+from app.core.exceptions import ResourceNotFoundError
+from app.core.validation import parse_uuid
 from app.domains.user.mappers.dtos import GetUserOutputDTO as GetUserOutput
 from app.domains.user.mappers.entity_dto_mapper import UserEntityDtoMapper
 from app.domains.user.repositories.user_repository import UserRepositoryInterface
@@ -44,14 +43,15 @@ class GetUserByIdUseCase:
             UserNotFoundError: If user is not found.
             DomainError: If the user_id is not a valid UUID.
         """
-        try:
-            uuid = UUID(user_id)
-        except ValueError:
-            raise DomainError(f"Invalid user ID format: {user_id}")
+        uuid = parse_uuid(user_id, "user_id")
 
         user = await self._user_repository.get_by_id(uuid)
         if user is None:
-            raise UserNotFoundError(f"User with ID {user_id} not found")
+            raise UserNotFoundError(
+                f"User with ID {user_id} not found",
+                code="USER_NOT_FOUND",
+                details={"user_id": user_id},
+            )
 
         return self._mapper.to_get_output(user)
 

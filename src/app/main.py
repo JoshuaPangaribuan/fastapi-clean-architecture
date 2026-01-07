@@ -8,12 +8,22 @@ It wires together all the components and starts the server.
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
+from fastapi.exceptions import RequestValidationError
+from pydantic import ValidationError
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
 from app.core.config import get_settings, reloader
 from app.core.exceptions import AppError
-from app.core.handlers import app_exception_handler, http_exception_handler
+from app.core.handlers import (
+    app_exception_handler,
+    http_exception_handler,
+    validation_exception_handler,
+)
+from app.core.logging_config import setup_logging
 from app.domains.user.presentation.v1.router import router as user_router
+
+# Setup logging before creating the app
+setup_logging()
 
 
 @asynccontextmanager
@@ -46,6 +56,8 @@ app.include_router(user_router, prefix=get_settings().API_V1_PREFIX)
 # Register exception handlers
 app.add_exception_handler(AppError, app_exception_handler)
 app.add_exception_handler(StarletteHTTPException, http_exception_handler)
+app.add_exception_handler(RequestValidationError, validation_exception_handler)
+app.add_exception_handler(ValidationError, validation_exception_handler)
 
 
 @app.get("/", tags=["Health"])

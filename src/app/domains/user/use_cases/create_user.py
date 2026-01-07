@@ -62,7 +62,11 @@ class CreateUserUseCase:
         # Check if user already exists
         existing_user = await self._user_repository.get_by_email(input_data.email)
         if existing_user is not None:
-            raise UserAlreadyExistsError(f"User with email {input_data.email} already exists")
+            raise UserAlreadyExistsError(
+                f"User with email {input_data.email} already exists",
+                code="USER_ALREADY_EXISTS",
+                details={"email": input_data.email},
+            )
 
         # Create the user entity from input DTO (this validates business rules)
         user = self._mapper.from_create_input(input_data)

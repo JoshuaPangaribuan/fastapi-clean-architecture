@@ -10,7 +10,6 @@ from pathlib import Path
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from watchfiles import awatch
 
-
 # Determine project root (4 levels up from this file)
 PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent.parent
 ENV_FILE = PROJECT_ROOT / ".env"

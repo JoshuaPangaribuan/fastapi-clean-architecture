@@ -10,6 +10,7 @@ from uuid import UUID
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.core.exceptions import ResourceNotFoundError
 from app.domains.user.entities.user import User
 from app.domains.user.infrastructure.database.models import UserModel
 from app.domains.user.mappers.entity_model_mapper import UserEntityModelMapper
@@ -79,7 +80,11 @@ class SQLAlchemyUserRepository(UserRepositoryInterface):
         model = result.scalars().first()
 
         if model is None:
-            raise ValueError(f"User with ID {user.id} not found")
+            raise ResourceNotFoundError(
+                f"User with ID {user.id} not found",
+                code="USER_NOT_FOUND",
+                details={"user_id": str(user.id)},
+            )
 
         model.email = user.email
         model.name = user.name

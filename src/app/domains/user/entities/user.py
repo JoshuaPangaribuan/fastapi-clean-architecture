@@ -6,8 +6,10 @@ It contains only business logic and has NO dependencies on external frameworks.
 """
 
 from dataclasses import dataclass, field
-from datetime import datetime
+from datetime import UTC, datetime
 from uuid import UUID, uuid4
+
+from app.core.exceptions import ValidationError as DomainValidationError
 
 
 @dataclass
@@ -23,7 +25,7 @@ class User:
     name: str
     id: UUID = field(default_factory=uuid4)
     is_active: bool = True
-    created_at: datetime = field(default_factory=datetime.utcnow)
+    created_at: datetime = field(default_factory=lambda: datetime.now(UTC))
     updated_at: datetime | None = None
 
     def __post_init__(self) -> None:
@@ -34,26 +36,38 @@ class User:
     def _validate_email(self) -> None:
         """Validate email format."""
         if not self.email or "@" not in self.email:
-            raise ValueError("Invalid email format")
+            raise DomainValidationError(
+                "Invalid email format",
+                code="INVALID_EMAIL_FORMAT",
+                details={"email": self.email},
+            )
 
     def _validate_name(self) -> None:
         """Validate name is not empty."""
         if not self.name or len(self.name.strip()) == 0:
-            raise ValueError("Name cannot be empty")
+            raise DomainValidationError(
+                "Name cannot be empty",
+                code="INVALID_NAME_FORMAT",
+                details={"name": self.name},
+            )
 
     def deactivate(self) -> None:
         """Deactivate the user."""
         self.is_active = False
-        self.updated_at = datetime.utcnow()
+        self.updated_at = datetime.now(UTC)
 
     def activate(self) -> None:
         """Activate the user."""
         self.is_active = True
-        self.updated_at = datetime.utcnow()
+        self.updated_at = datetime.now(UTC)
 
     def update_name(self, new_name: str) -> None:
         """Update user's name."""
         if not new_name or len(new_name.strip()) == 0:
-            raise ValueError("Name cannot be empty")
+            raise DomainValidationError(
+                "Name cannot be empty",
+                code="INVALID_NAME_FORMAT",
+                details={"name": new_name},
+            )
         self.name = new_name.strip()
-        self.updated_at = datetime.utcnow()
+        self.updated_at = datetime.now(UTC)

@@ -4,9 +4,7 @@ Delete User Use Case.
 This contains the application business logic for deleting a user.
 """
 
-from uuid import UUID
-
-from app.core.exceptions import DomainError
+from app.core.validation import parse_uuid
 from app.domains.user.repositories.user_repository import UserRepositoryInterface
 from app.domains.user.use_cases.get_user import UserNotFoundError
 
@@ -32,13 +30,14 @@ class DeleteUserUseCase:
             UserNotFoundError: If user is not found.
             DomainError: If user_id is not a valid UUID.
         """
-        try:
-            uuid = UUID(user_id)
-        except ValueError:
-            raise DomainError(f"Invalid user ID format: {user_id}")
+        uuid = parse_uuid(user_id, "user_id")
 
         deleted = await self._user_repository.delete(uuid)
         if not deleted:
-            raise UserNotFoundError(f"User with ID {user_id} not found")
+            raise UserNotFoundError(
+                f"User with ID {user_id} not found",
+                code="USER_NOT_FOUND",
+                details={"user_id": user_id},
+            )
 
         return True
