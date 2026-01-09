@@ -13,3 +13,7 @@ wheels/
 .env
 .env.local
 .env.*.local
+
+# IDE and AI assistant files
+.serena
+CLAUDE.md
